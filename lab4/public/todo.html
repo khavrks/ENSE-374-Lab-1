@@ -27,27 +27,13 @@
                                 <button class="add btn btn-primary font-weight-bold todo-list-add-btn"
                                 >
                                     Add</button> 
+                                    <button class="add btn btn-primary font-weight-bold todo-list-sort-btn"
+                                    >
+                                        sort</button> 
                             </div>
                             <div class="list-wrapper">
                                 <ul class="d-flex flex-column-reverse todo-list">
-                                    <li>
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox"> For what reason would it be advisable. <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
-                                    <li class="completed">
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox" checked=""> For what reason would it be advisable for me to think. <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
-                                    <li>
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox"> it be advisable for me to think about business content? <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
-                                    <li>
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox"> Print Statements all <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
-                                    <li class="completed">
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox" checked=""> Call Rampbo <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
-                                    <li>
-                                        <div class="form-check"> <label class="form-check-label"> <input class="checkbox" type="checkbox"> Print bills <i class="input-helper"></i></label> </div> <i class="remove mdi mdi-close-circle-outline"></i>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </div>
@@ -57,31 +43,41 @@
         </div>
     </div>  
 </body>
+
 <script>
-
-$(function() {
-
-var todoListItem = $('.todo-list');
-var people = [];
-
-$.getJSON('file:///C:/code/ense374/ENSE-374-Labs/lab4/public/todo.json', function(data) {
-    $.each(data.todo, function(item) {
-        console.log(data.todo);
-        todoListItem.append("<li><div class='form-check'><label class='form-check-label'><input class='checkbox' type='checkbox'/>" + item + "<i class='input-helper'></i></label></div><i class='remove mdi mdi-close-circle-outline'></i></li>");
-        todoListInput.val("");
-  });
-
-});
-
-});
-
 
 
     (function($) {
   'use strict';
   $(function() {
+
     var todoListItem = $('.todo-list');
     var todoListInput = $('.todo-list-input');
+
+    let list = [
+            {"element":"For what reason would it be advisable."},
+            {"element": "For what reason would it be advisable for me to think."},
+            {"element": "it be advisable for me to think about business content?"},
+            {"element": "Print Statements all"}
+        ]
+    list.sort();
+
+    list.forEach(element => {
+        todoListItem.append("<li><div class='form-check'><label class='form-check-label'><input class='checkbox' type='checkbox'/>" + element.element + "<i class='input-helper'></i></label></div><i class='remove mdi mdi-close-circle-outline'></i></li>");
+        todoListInput.val("");
+    });
+
+    $('.todo-list-sort-btn').on("click", function(event) {
+        event.preventDefault();
+        list.sort();
+        todoListItem.empty();
+        list.sort();
+        console.log(list);
+        list.forEach(element => {
+            todoListItem.append("<li><div class='form-check'><label class='form-check-label'><input class='checkbox' type='checkbox'/>" + element.element + "<i class='input-helper'></i></label></div><i class='remove mdi mdi-close-circle-outline'></i></li>")
+        });
+    });
+
     $('.todo-list-add-btn').on("click", function(event) {
       event.preventDefault();
 
@@ -90,6 +86,9 @@ $.getJSON('file:///C:/code/ense374/ENSE-374-Labs/lab4/public/todo.json', functio
       if (item) {
         todoListItem.append("<li><div class='form-check'><label class='form-check-label'><input class='checkbox' type='checkbox'/>" + item + "<i class='input-helper'></i></label></div><i class='remove mdi mdi-close-circle-outline'></i></li>");
         todoListInput.val("");
+        list.push({"element": item});
+        list.sort();
+        console.log(list);
       }
 
     });
