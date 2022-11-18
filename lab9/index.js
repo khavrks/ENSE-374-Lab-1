@@ -1,6 +1,35 @@
 const path = require('path');
 const express = require('express');
 const app = express();
+const mongoose = require( "mongoose" );
+const passport = require("passport")
+const passportLocalMongoose = require("passport-local-mongoose")
+
+mongoose.connect( "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true});
+
+
+const userSchema = new mongoose.Schema ({
+    user:   String,
+    email:      String,
+    password:   String,
+    phone:      String
+});
+
+const Users = mongoose.model ("Users", userSchema);
+
+const ToDoSchema = new mongoose.Schema ({
+    text:   String,
+    state:   String,
+    user:    String,
+    isTaskDone: Boolean, 
+    isTaskCleared: Boolean
+});
+
+const ToDo = mongoose.model ("Tasks", ToDoSchema);
+
+passport.use(Users.createStrategy());
+passport.serializeUser(Users.serializeUser());
+passport.deserializeUser(Users.deserializeUser());
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs');
@@ -55,10 +84,17 @@ app.post("/register", (req, res) => {
     {
         users.push({"user": user, "password": password});
         var fs = require('fs')
-        fs.writeFile('./public/login.json', JSON.stringify(users), (err) => {
-            if (err) console.log(err);
-        });
+        Users.register({username, email, password, phone}, password, (err, user) => {   
+            if (err) {
+                console.log(err);
+                res.redirect("/");
+            } else {
+                passport.authenticate("local")(req, res, () => {
+                req.session.user = user;
+            });
+        }
         res.redirect("/todo");
+    });
     }
     
     res.redirect("/");

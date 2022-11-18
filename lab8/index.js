@@ -1,6 +1,29 @@
 const path = require('path');
 const express = require('express');
 const app = express();
+const mongoose = require( "mongoose" );
+
+mongoose.connect( "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true});
+
+
+const userSchema = new mongoose.Schema ({
+    user:   String,
+    email:      String,
+    password:   String,
+    phone:      String
+});
+
+const Users = mongoose.model ("Users", userSchema);
+
+const ToDoSchema = new mongoose.Schema ({
+    text:   String,
+    state:   String,
+    user:    String,
+    isTaskDone: Boolean, 
+    isTaskCleared: Boolean
+});
+
+const ToDo = mongoose.model ("Tasks", ToDoSchema);
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs');
@@ -12,7 +35,7 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     let userId = '';
-    User.findOne({ email }).select('+password')
+    Users.findOne({ email }).select('+password')
         .then((user) => {
             if (!user) {
                 console.log('User not found');
@@ -54,10 +77,13 @@ app.post("/register", (req, res) => {
     if(!exists)
     {
         users.push({"user": user, "password": password});
-        var fs = require('fs')
-        fs.writeFile('./public/login.json', JSON.stringify(users), (err) => {
-            if (err) console.log(err);
+        const saveuser = new Users({
+            username: registerUser,
+            password: registerPassword
         });
+
+        saveuser.save();
+
         res.redirect("/todo");
     }
     
